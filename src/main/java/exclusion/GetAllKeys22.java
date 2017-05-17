@@ -23,31 +23,26 @@ public class GetAllKeys22 {
 		ArrayList<Map<String, Object>> mlist = new ArrayList<>();
 		ArrayList<Map<String, Object>> mlist2 = new ArrayList<>();
 		ArrayList<Map<String, Object>> listInProtocol = new ArrayList<>();
-		
+
 		Map<String, Object> m2 = new LinkedHashMap<>();
 		Map<String, Object> m3 = new LinkedHashMap<>();
 		Map<String, Object> m4 = new LinkedHashMap<>();
 		Map<String, Object> mapForProtocolList1 = new LinkedHashMap<>();
 		Map<String, Object> mapForProtocolList2 = new LinkedHashMap<>();
 		Map<String, Object> mapForProtocolList3 = new LinkedHashMap<>();
-		
+
 		mapForProtocolList1.put("p1", "p1");
 		mapForProtocolList2.put("p2", "p2");
 		mapForProtocolList3.put("p3", "p3");
 		listInProtocol.add(mapForProtocolList1);
 		listInProtocol.add(mapForProtocolList2);
 		listInProtocol.add(mapForProtocolList3);
-		
-		
-		
+
 		m1.put("PROTOCOL_ID", "1");
 		m1.put("PROTOCOL_TYPE", "abc");
-	//	m1.put("PROTOCOL_LIST", listInProtocol);
-		//add list here 
-		
-		
-		
-		
+		m1.put("PROTOCOL_LIST", listInProtocol);
+		// add list here
+
 		m2.put("PROTOCOL", m1);
 		m2.put("DOCUMENT_ID", "1");
 		m2.put("DOCUMENT_TYPE", "abc");
@@ -85,20 +80,20 @@ public class GetAllKeys22 {
 		m3.put("SETTLEMENT_ID", "3");
 		m3.put("PROGRAM_ID", "3");
 		m3.put("nestedList", mlist2);
-		
+
 		mlist.add(m3);
 
 		m4.put("PROTOCOL_ID", "1");
 		m4.put("PROTOCOL_TYPE", "abc");
 		m.put("NAME", "piyush");
 		m.put("SETTLEMENT", mlist);
-		
+
 		m.put("PROTOCOLL", m4);
 		m.put("TEST", "TEST");
 		m.put("PROTOCOL2", m4);
 
 		m.put("SETTLEMENT2", mlist);
-		
+
 		System.out.println("Before: ");
 		String before = gson.toJson(m);
 		System.out.println(before);
@@ -112,6 +107,8 @@ public class GetAllKeys22 {
 	static List<String> keysList = new ArrayList();
 	static String keyStack = new String("#");
 	static boolean listFlag = false;
+	static int listFlagArray[];
+	static int listFlagIndex = 0;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static List<String> getAllKeys(Map<String, Object> map) {
@@ -120,8 +117,9 @@ public class GetAllKeys22 {
 			if (entry.getValue() instanceof Map) {
 				keyStack = keyStack + entry.getKey() + ".";
 				getAllKeys((Map<String, Object>) entry.getValue());
-				
 			} else if (entry.getValue() instanceof ArrayList) {
+				listFlagIndex++;
+				// listFlagArray[listFlagIndex]=listFlagIndex;
 				keyStack = keyStack + entry.getKey() + ".";
 				List<Object> l = (List) entry.getValue();
 				for (Object m : l) {
@@ -153,16 +151,20 @@ public class GetAllKeys22 {
 					}
 					keyStack = keyStack + ".";
 				}
+				if (listFlagIndex > 1) {
+					keyStack = keyStack.substring(0, keyStack.lastIndexOf("."));
+				}
+				listFlagIndex--;
 			} else {
 				if (keyStack.length() > 0) {
-					if(keyStack.equals("."))
-						keyStack="#";
-						
+					if (keyStack.equals("."))
+						keyStack = "#";
+
 					keysList.add(keyStack + entry.getKey());
 				}
 			}
 		}
-		if (keyStack.length() > 0) {
+		if (keyStack.length() > 0 && !(listFlagIndex > 1)) {
 			if (keyStack.lastIndexOf(".") == keyStack.length() - 1 && StringUtils.countMatches(keyStack, ".") == 1) {
 				keyStack = keyStack.substring(0, keyStack.lastIndexOf("."));
 			} else {
